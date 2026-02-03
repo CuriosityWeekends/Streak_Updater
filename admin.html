@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Daily Streak Admin Panel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* ================= THEME ================= */
+
+:root{
+  --bg:#020617;
+  --panel:#020617cc;
+  --card:#020617;
+  --border:#1e293b;
+  --primary:#3b82f6;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --success:#22c55e;
+}
+
+/* ================= RESET ================= */
+
+*{
+  box-sizing:border-box;
+  font-family:Inter,sans-serif;
+}
+
+body{
+  margin:0;
+  background:linear-gradient(135deg,#020617,#0f172a);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ================= HEADER ================= */
+
+header{
+  background:#020617ee;
+  border-bottom:1px solid var(--border);
+  padding:18px 25px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+header h1{
+  margin:0;
+  color:var(--primary);
+  font-size:20px;
+}
+
+/* ================= LAYOUT ================= */
+
+.container{
+  max-width:1400px;
+  margin:auto;
+  padding:25px;
+}
+
+/* ================= CARD ================= */
+
+.card{
+  background:linear-gradient(180deg,#020617,#020617cc);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 8px 25px rgba(0,0,0,.4);
+}
+
+.card h2{
+  margin:0 0 12px;
+  font-size:16px;
+  color:#bfdbfe;
+}
+
+/* ================= CONTROLS ================= */
+
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:end;
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  font-size:12px;
+}
+
+.field input{
+  background:#020617;
+  border:1px solid var(--border);
+  color:white;
+  padding:7px 9px;
+  border-radius:6px;
+}
+
+.field input:focus{
+  outline:none;
+  border-color:var(--primary);
+}
+
+/* ================= BUTTON ================= */
+
+button{
+  background:linear-gradient(135deg,#3b82f6,#2563eb);
+  border:none;
+  padding:9px 15px;
+  color:white;
+  font-weight:600;
+  border-radius:7px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+button:hover{
+  transform:scale(1.03);
+}
+
+/* ================= TABLE ================= */
+
+.table-box{
+  max-height:450px;
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:10px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+}
+
+th{
+  background:#020617;
+  color:#93c5fd;
+  position:sticky;
+  top:0;
+  z-index:5;
+  padding:7px;
+}
+
+td{
+  padding:6px;
+  border-bottom:1px solid var(--border);
+  text-align:center;
+}
+
+tr:hover{
+  background:#020617;
+}
+
+/* ================= PREVIEW ================= */
+
+.preview{
+  background:#020617;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:15px;
+  max-height:350px;
+  overflow:auto;
+  font-size:13px;
+  white-space:pre-wrap;
+}
+
+/* ================= FOOTER ================= */
+
+.footer{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🛠 Daily Streak Admin</h1>
+  <span>Report & Analytics</span>
+</header>
+
+
+<div class="container">
+
+<!-- ================= CONTROLS ================= -->
+
+<div class="card">
+
+<h2>📅 Report Controls</h2>
+
+<div class="controls">
+
+  <div class="field">
+    <label>From Date</label>
+    <input type="date" id="fromDate">
+  </div>
+
+  <div class="field">
+    <label>To Date</label>
+    <input type="date" id="toDate">
+  </div>
+
+  <div class="field">
+    <label>Name Filter</label>
+    <input id="nameFilter" placeholder="Afkar">
+  </div>
+
+  <button onclick="loadData()">🔄 Refresh</button>
+  <button onclick="generateReport()">📄 Generate MD</button>
+  <button onclick="downloadReport()">⬇️ Download</button>
+
+</div>
+
+</div>
+
+
+<!-- ================= TABLE ================= -->
+
+<div class="card">
+
+<h2>📊 All Submissions</h2>
+
+<div class="table-box">
+
+<table id="dataTable"></table>
+
+</div>
+
+</div>
+
+
+<!-- ================= PREVIEW ================= -->
+
+<div class="card">
+
+<h2>📝 Markdown Preview</h2>
+
+<div id="preview" class="preview">
+No report generated yet.
+</div>
+
+</div>
+
+
+<div class="footer">
+Daily Streak Admin • Built by Curiosity Weekends 🚀
+</div>
+
+
+</div>
+
+
+<script>
+
+/* ================= CONFIG ================= */
+
+const API = "https://script.google.com/macros/s/AKfycbwaZN3uo-CVGI59m7cTnRfGtlP8Jvp5LXTx54f4vEZ2_3RoOleP2w4JYfyYA7h3qKuM/exec";
+
+
+let allData = [];
+let currentMD = "";
+
+
+/* ================= LOAD DATA ================= */
+
+function loadData(){
+
+  fetch(API+"?admin=1")
+  .then(r=>r.json())
+  .then(data=>{
+
+    allData = data;
+    renderTable(data);
+
+  });
+
+}
+
+
+/* ================= TABLE ================= */
+
+function renderTable(data){
+
+  let html = `
+<tr>
+<th>#</th>
+<th>Date</th>
+<th>UID</th>
+<th>Discord</th>
+<th>Name</th>
+<th>Subject</th>
+<th>Topic</th>
+<th>XP</th>
+<th>Total</th>
+<th>Streak</th>
+</tr>`;
+
+  data.forEach((r,i)=>{
+
+    html += `
+<tr>
+<td>${i+1}</td>
+<td>${r.time}</td>
+<td>${r.uid}</td>
+<td>${r.discord}</td>
+<td>${r.name}</td>
+<td>${r.subject}</td>
+<td>${r.topic}</td>
+<td>${r.xp}</td>
+<td>${r.totalXP}</td>
+<td>${r.streak}</td>
+</tr>`;
+
+  });
+
+  dataTable.innerHTML = html;
+
+}
+
+
+/* ================= FILTER ================= */
+
+function filterData(){
+
+  const from = fromDate.value;
+  const to = toDate.value;
+  const name = nameFilter.value.toLowerCase();
+
+  return allData.filter(r=>{
+
+    const d = r.time.split(" ")[0].split("/").reverse().join("-");
+
+    if(from && d < from) return false;
+    if(to && d > to) return false;
+
+    if(name && !r.name.toLowerCase().includes(name))
+      return false;
+
+    return true;
+
+  });
+
+}
+
+
+/* ================= MARKDOWN ================= */
+
+function generateReport(){
+
+  const data = filterData();
+
+  if(data.length === 0){
+
+    preview.innerText = "No data in selected range.";
+    return;
+
+  }
+
+  let md = `# 📊 Daily Streak Report\n\n`;
+  md += `Generated: ${new Date().toLocaleString()}\n\n`;
+  md += `---\n\n`;
+
+  data.forEach((r,i)=>{
+
+    md += `## ${i+1}. ${r.name}\n\n`;
+
+    md += `- **Discord:** ${r.discord}\n`;
+    md += `- **UID:** ${r.uid}\n`;
+    md += `- **Date:** ${r.time}\n`;
+    md += `- **Subject:** ${r.subject}\n`;
+    md += `- **Topic:** ${r.topic}\n`;
+    md += `- **XP:** ${r.xp}\n`;
+    md += `- **Total XP:** ${r.totalXP}\n`;
+    md += `- **Streak:** ${r.streak}\n\n`;
+
+    md += `### About\n${r.about}\n\n`;
+    md += `### Work\n${r.work}\n\n`;
+
+    md += `🔗 ${r.git || "No Git"}\n\n`;
+    md += `---\n\n`;
+
+  });
+
+  currentMD = md;
+
+  preview.innerText = md;
+
+}
+
+
+/* ================= DOWNLOAD ================= */
+
+function downloadReport(){
+
+  if(!currentMD){
+
+    alert("Generate report first!");
+    return;
+
+  }
+
+  const blob = new Blob([currentMD],{type:"text/markdown"});
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = "daily_streak_report.md";
+
+  document.body.appendChild(a);
+  a.click();
+
+  document.body.removeChild(a);
+
+  URL.revokeObjectURL(url);
+
+}
+
+
+/* ================= INIT ================= */
+
+loadData();
+
+</script>
+
+</body>
+</html>
