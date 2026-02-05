@@ -108,7 +108,7 @@ header span{
   color:var(--muted);
 }
 
-/* =============== PROGRESS =============== */
+/* =============== PROGRESS ================= */
 
 .progress-box{
   margin:12px 0;
@@ -134,7 +134,7 @@ header span{
   transition:width .7s ease;
 }
 
-/* =============== FORM =============== */
+/* =============== FORM ================= */
 
 .field{
   margin-bottom:12px;
@@ -146,7 +146,8 @@ header span{
 }
 
 .field input,
-.field textarea{
+.field textarea,
+.field select{
   width:100%;
   background:#020617;
   border:1px solid #1e293b;
@@ -163,12 +164,13 @@ header span{
 }
 
 .field input:focus,
-.field textarea:focus{
+.field textarea:focus,
+.field select:focus{
   outline:none;
   border-color:var(--primary);
 }
 
-/* =============== BUTTON =============== */
+/* =============== BUTTON ================= */
 
 button{
   width:100%;
@@ -186,7 +188,7 @@ button:hover{
   transform:scale(1.02);
 }
 
-/* =============== MESSAGE =============== */
+/* =============== MESSAGE ================= */
 
 #msg{
   text-align:center;
@@ -194,7 +196,7 @@ button:hover{
   font-size:13px;
 }
 
-/* =============== TABLE =============== */
+/* =============== TABLE ================= */
 
 table{
   width:100%;
@@ -218,7 +220,7 @@ td{
 .rank2{background:#e5e7eb;color:black}
 .rank3{background:#fed7aa;color:black}
 
-/* =============== SUCCESS =============== */
+/* =============== SUCCESS ================= */
 
 .success{
   position:fixed;
@@ -245,7 +247,7 @@ td{
   to{transform:scale(1);opacity:1}
 }
 
-/* =============== MOBILE =============== */
+/* =============== MOBILE ================= */
 
 @media(max-width:900px){
 
@@ -323,8 +325,8 @@ td{
 <h2>✍️ Submit Today’s Work</h2>
 
 <div class="field">
-<label>Discord User ID</label>
-<input id="discord">
+<label>Discord Username</label>
+<input id="discord" placeholder="afkar3374">
 </div>
 
 <div class="field">
@@ -337,10 +339,31 @@ td{
 <input id="cls">
 </div>
 
+
+<!-- SUBJECT DROPDOWN -->
+
 <div class="field">
 <label>Subject</label>
-<input id="subject">
+
+<select id="subject" onchange="checkSubject()">
+  <option value="">Select Subject</option>
+  <option value="Maths">Maths</option>
+  <option value="Physics">Physics</option>
+  <option value="Other">Other</option>
+</select>
+
 </div>
+
+
+<!-- OTHER SUBJECT -->
+
+<div class="field" id="otherBox" style="display:none;">
+
+<label>Other Subject</label>
+<input id="otherSubject" placeholder="Enter subject">
+
+</div>
+
 
 <div class="field">
 <label>Topic</label>
@@ -404,27 +427,57 @@ td{
 const API = "https://script.google.com/macros/s/AKfycbwaZN3uo-CVGI59m7cTnRfGtlP8Jvp5LXTx54f4vEZ2_3RoOleP2w4JYfyYA7h3qKuM/exec";
 
 
-/* =============== SUBMIT =============== */
+function checkSubject(){
+
+  const sub = document.getElementById("subject").value;
+  const box = document.getElementById("otherBox");
+
+  if(sub === "Other"){
+    box.style.display = "block";
+  }else{
+    box.style.display = "none";
+    document.getElementById("otherSubject").value="";
+  }
+
+}
+
+
+function getFinalSubject(){
+
+  const s = document.getElementById("subject").value;
+
+  if(s === "Other"){
+    return document.getElementById("otherSubject").value.trim();
+  }
+
+  return s;
+
+}
+
+
+/* =============== SUBMIT ================= */
 
 function submitData(){
 
   const d = document.getElementById("discord").value.trim();
   const n = document.getElementById("name").value.trim();
+  const s = getFinalSubject();
 
-  if(!d || !n){
+  if(!d || !n || !s){
 
-    msg.innerText="⚠️ Enter Name & Discord ID";
+    msg.innerText="⚠️ Fill Name, Discord & Subject";
     msg.style.color="orange";
     return;
 
   }
+
 
   const data = {
 
     discord: d,
     name: n,
     class: document.getElementById("cls").value,
-    subject: document.getElementById("subject").value,
+    subject: s,
     topic: document.getElementById("topic").value,
     about: document.getElementById("about").value,
     work: document.getElementById("work").value,
@@ -458,7 +511,7 @@ function submitData(){
 }
 
 
-/* =============== SUCCESS =============== */
+/* =============== SUCCESS ================= */
 
 function showSuccess(){
 
@@ -471,20 +524,22 @@ function showSuccess(){
 }
 
 
-/* =============== CLEAR =============== */
+/* =============== CLEAR ================= */
 
 function clearForm(){
 
-  document.getElementById("subject").value="";
   document.getElementById("topic").value="";
   document.getElementById("about").value="";
   document.getElementById("work").value="";
   document.getElementById("git").value="";
+  document.getElementById("subject").value="";
+  document.getElementById("otherSubject").value="";
+  document.getElementById("otherBox").style.display="none";
 
 }
 
 
-/* =============== LEADERBOARD =============== */
+/* =============== LEADERBOARD ================= */
 
 function loadBoard(){
 
@@ -536,8 +591,6 @@ function loadBoard(){
 
 }
 
-
-/* =============== AUTO LOAD =============== */
 
 loadBoard();
 
