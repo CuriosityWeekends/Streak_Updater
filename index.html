@@ -3,387 +3,105 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Daily Streak Dashboard</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
 <style>
-
-/* =============== THEME =============== */
-
-:root{
-  --bg:#0f172a;
-  --panel:#020617;
-  --card:#020617cc;
-  --primary:#3b82f6;
-  --success:#22c55e;
-  --warn:#facc15;
-  --text:#e5e7eb;
-  --muted:#94a3b8;
-}
-
-/* =============== RESET =============== */
-
-*{
-  box-sizing:border-box;
-  font-family:'Inter',sans-serif;
-}
-
 body{
+  font-family:sans-serif;
+  background:#0f172a;
+  color:white;
   margin:0;
-  background:linear-gradient(135deg,#020617,#0f172a);
-  color:var(--text);
-  min-height:100vh;
 }
-
-/* =============== HEADER =============== */
-
-header{
-  background:rgba(2,6,23,.9);
-  border-bottom:1px solid #1e293b;
-  padding:18px 25px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-header h1{
-  margin:0;
-  font-size:20px;
-  color:var(--primary);
-}
-
-header span{
-  color:var(--muted);
-  font-size:13px;
-}
-
-/* =============== LAYOUT =============== */
 
 .container{
-  max-width:1200px;
+  max-width:1100px;
   margin:auto;
-  padding:25px;
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:25px;
+  padding:20px;
 }
-
-/* =============== CARD =============== */
 
 .card{
-  background:linear-gradient(180deg,#020617,#020617cc);
-  border:1px solid #1e293b;
-  border-radius:16px;
-  padding:22px;
-  box-shadow:0 10px 30px rgba(0,0,0,.4);
-}
-
-/* =============== DASHBOARD =============== */
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:15px;
-  margin-bottom:15px;
-}
-
-.stat{
   background:#020617;
-  border:1px solid #1e293b;
-  border-radius:12px;
-  padding:14px;
-  text-align:center;
-}
-
-.stat h3{
-  margin:0;
-  font-size:20px;
-  color:var(--primary);
-}
-
-.stat span{
-  font-size:12px;
-  color:var(--muted);
-}
-
-/* =============== PROGRESS ================= */
-
-.progress-box{
-  margin:12px 0;
-}
-
-.progress-label{
-  font-size:12px;
-  color:var(--muted);
-  margin-bottom:4px;
-}
-
-.progress{
-  height:8px;
-  background:#020617;
+  padding:20px;
   border-radius:10px;
-  overflow:hidden;
+  margin-bottom:20px;
 }
-
-.progress-fill{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#3b82f6,#60a5fa);
-  transition:width .7s ease;
-}
-
-/* =============== FORM ================= */
-
-.field{
-  margin-bottom:12px;
-}
-
-.field label{
-  font-size:12px;
-  color:var(--muted);
-}
-
-.field input,
-.field textarea,
-.field select{
-  width:100%;
-  background:#020617;
-  border:1px solid #1e293b;
-  border-radius:10px;
-  padding:9px 10px;
-  color:white;
-  margin-top:4px;
-  font-size:13px;
-}
-
-.field textarea{
-  resize:none;
-  height:70px;
-}
-
-.field input:focus,
-.field textarea:focus,
-.field select:focus{
-  outline:none;
-  border-color:var(--primary);
-}
-
-/* =============== BUTTON ================= */
 
 button{
-  width:100%;
-  background:linear-gradient(135deg,#3b82f6,#2563eb);
+  padding:10px 15px;
   border:none;
-  padding:12px;
+  border-radius:8px;
+  background:#3b82f6;
   color:white;
-  font-weight:600;
-  border-radius:12px;
   cursor:pointer;
-  transition:.3s;
 }
 
-button:hover{
-  transform:scale(1.02);
+input,textarea,select{
+  width:100%;
+  margin:6px 0;
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #1e293b;
+  background:#020617;
+  color:white;
 }
-
-/* =============== MESSAGE ================= */
-
-#msg{
-  text-align:center;
-  margin-top:10px;
-  font-size:13px;
-}
-
-/* =============== TABLE ================= */
 
 table{
   width:100%;
   border-collapse:collapse;
-  font-size:13px;
 }
 
-th{
-  background:#020617;
-  color:#93c5fd;
+td,th{
   padding:8px;
-}
-
-td{
-  padding:7px;
   border-bottom:1px solid #1e293b;
   text-align:center;
 }
-
-.rank1{background:#fde68a;color:black}
-.rank2{background:#e5e7eb;color:black}
-.rank3{background:#fed7aa;color:black}
-
-/* =============== SUCCESS ================= */
-
-.success{
-  position:fixed;
-  inset:0;
-  background:rgba(2,6,23,.7);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:999;
-}
-
-.success-card{
-  background:#020617;
-  border-radius:20px;
-  padding:35px;
-  text-align:center;
-  animation:pop .4s ease;
-}
-
-.success-card h3{color:var(--success)}
-
-@keyframes pop{
-  from{transform:scale(.6);opacity:0}
-  to{transform:scale(1);opacity:1}
-}
-
-/* =============== MOBILE ================= */
-
-@media(max-width:900px){
-
-  .container{
-    grid-template-columns:1fr;
-  }
-
-  .stats{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-}
-
 </style>
 </head>
 
 <body>
 
-<header>
-  <h1>⚡ Daily Streak</h1>
-  <span>Learn • Build • Improve</span>
-</header>
-
-
 <div class="container">
 
-<!-- DASHBOARD -->
-
+<!-- LOGIN -->
 <div class="card">
+  <h2>🔐 Login</h2>
 
-<h2>📊 My Dashboard</h2>
-
-<div class="stats">
-
-  <div class="stat">
-    <h3 id="dName">-</h3>
-    <span>Name</span>
-  </div>
-
-  <div class="stat">
-    <h3 id="dXP">0</h3>
-    <span>Total XP</span>
-  </div>
-
-  <div class="stat">
-    <h3 id="dStreak">0</h3>
-    <span>Streak</span>
-  </div>
-
-  <div class="stat">
-    <h3 id="dRank">-</h3>
-    <span>Rank</span>
-  </div>
+  <input id="discordInput" placeholder="Enter Discord Username (afkar#1234)">
+  <button onclick="login()">Login</button>
 
 </div>
 
+<!-- APP -->
+<div id="app" style="display:none">
 
-<div class="progress-box">
-  <div class="progress-label">XP Level</div>
-  <div class="progress"><div id="xpBar" class="progress-fill"></div></div>
+<!-- DASHBOARD -->
+<div class="card">
+  <h2>📊 My Dashboard</h2>
+
+  <p><b>Name:</b> <span id="dName">-</span></p>
+  <p><b>XP:</b> <span id="dXP">0</span></p>
+  <p><b>Streak:</b> <span id="dStreak">0</span></p>
+  <p><b>Rank:</b> <span id="dRank">-</span></p>
+
 </div>
-
-<div class="progress-box">
-  <div class="progress-label">Streak Power</div>
-  <div class="progress"><div id="streakBar" class="progress-fill"></div></div>
-</div>
-
-</div>
-
 
 <!-- FORM -->
-
 <div class="card">
 
-<h2>✍️ Submit Today’s Work</h2>
+<h2>✍️ Submit Work</h2>
 
-<div class="field">
-<label>Discord Username</label>
-<input id="discord" placeholder="afkar3374">
-</div>
+<input id="discord" disabled>
+<input id="name" placeholder="Name">
 
-<div class="field">
-<label>Name</label>
-<input id="name">
-</div>
-
-<div class="field">
-<label>Class</label>
-<input id="cls">
-</div>
-
-
-<!-- SUBJECT DROPDOWN -->
-
-<div class="field">
-<label>Subject</label>
-
-<select id="subject" onchange="checkSubject()">
+<select id="subject">
   <option value="">Select Subject</option>
-  <option value="Maths">Maths</option>
-  <option value="Physics">Physics</option>
-  <option value="Other">Other</option>
+  <option>Math</option>
+  <option>Physics</option>
+  <option>Other</option>
 </select>
 
-</div>
-
-
-<!-- OTHER SUBJECT -->
-
-<div class="field" id="otherBox" style="display:none;">
-
-<label>Other Subject</label>
-<input id="otherSubject" placeholder="Enter subject">
-
-</div>
-
-
-<div class="field">
-<label>Topic</label>
-<input id="topic">
-</div>
-
-<div class="field">
-<label>About</label>
-<textarea id="about"></textarea>
-</div>
-
-<div class="field">
-<label>Work Done</label>
-<textarea id="work"></textarea>
-</div>
-
-<div class="field">
-<label>Git Link</label>
-<input id="git">
-</div>
+<input id="topic" placeholder="Topic">
+<textarea id="work" placeholder="Work"></textarea>
 
 <button onclick="submitData()">Submit</button>
 
@@ -391,10 +109,8 @@ td{
 
 </div>
 
-
 <!-- LEADERBOARD -->
-
-<div class="card" style="grid-column:1/3">
+<div class="card">
 
 <h2>🏆 Leaderboard</h2>
 
@@ -402,146 +118,82 @@ td{
 
 </div>
 
-</div>
-
-
-<!-- SUCCESS -->
-
-<div id="successBox" class="success">
-
-  <div class="success-card">
-
-    <h1>✔️</h1>
-    <h3>Submitted!</h3>
-    <p>Keep going 💪</p>
-
-  </div>
+<button onclick="logout()">Logout</button>
 
 </div>
 
+</div>
 
 <script>
 
-/* =============== CONFIG =============== */
-
 const API = "https://script.google.com/macros/s/AKfycbwaZN3uo-CVGI59m7cTnRfGtlP8Jvp5LXTx54f4vEZ2_3RoOleP2w4JYfyYA7h3qKuM/exec";
 
+/* LOGIN */
+function login(){
 
-function checkSubject(){
+  const discord = document.getElementById("discordInput").value.trim();
 
-  const sub = document.getElementById("subject").value;
-  const box = document.getElementById("otherBox");
+  if(!discord){
+    alert("Enter Discord username");
+    return;
+  }
 
-  if(sub === "Other"){
-    box.style.display = "block";
-  }else{
-    box.style.display = "none";
-    document.getElementById("otherSubject").value="";
+  localStorage.setItem("discord", discord);
+
+  location.reload();
+}
+
+/* LOGOUT */
+function logout(){
+  localStorage.clear();
+  location.reload();
+}
+
+/* CHECK LOGIN */
+function checkLogin(){
+
+  const discord = localStorage.getItem("discord");
+
+  if(discord){
+    document.getElementById("app").style.display="block";
+    document.getElementById("discord").value=discord;
   }
 
 }
 
-
-function getFinalSubject(){
-
-  const s = document.getElementById("subject").value;
-
-  if(s === "Other"){
-    return document.getElementById("otherSubject").value.trim();
-  }
-
-  return s;
-
-}
-
-
-/* =============== SUBMIT ================= */
-
+/* SUBMIT */
 function submitData(){
 
-  const d = document.getElementById("discord").value.trim();
-  const n = document.getElementById("name").value.trim();
-  const s = getFinalSubject();
+  const discord = localStorage.getItem("discord");
+  const name = document.getElementById("name").value;
 
-  if(!d || !n || !s){
-
-    msg.innerText="⚠️ Fill Name, Discord & Subject";
-    msg.style.color="orange";
+  if(!name){
+    msg.innerText="⚠️ Enter name";
     return;
-
   }
 
-
   const data = {
-
-    discord: d,
-    name: n,
-    class: document.getElementById("cls").value,
-    subject: s,
+    discord: discord,
+    name: name,
+    subject: document.getElementById("subject").value,
     topic: document.getElementById("topic").value,
-    about: document.getElementById("about").value,
-    work: document.getElementById("work").value,
-    git: document.getElementById("git").value
-
+    work: document.getElementById("work").value
   };
 
-
-  msg.innerText="Submitting...";
-  msg.style.color="#60a5fa";
-
-
   fetch(API,{
-
     method:"POST",
     mode:"no-cors",
     body:JSON.stringify(data)
-
-  })
-  .then(()=>{
-
-    msg.innerText="✅ Submitted!";
-    msg.style.color="#22c55e";
-
-    showSuccess();
-    clearForm();
-    loadBoard();
-
   });
 
+  msg.innerText="✅ Submitted!";
+  loadBoard();
 }
 
-
-/* =============== SUCCESS ================= */
-
-function showSuccess(){
-
-  successBox.style.display="flex";
-
-  setTimeout(()=>{
-    successBox.style.display="none";
-  },1300);
-
-}
-
-
-/* =============== CLEAR ================= */
-
-function clearForm(){
-
-  document.getElementById("topic").value="";
-  document.getElementById("about").value="";
-  document.getElementById("work").value="";
-  document.getElementById("git").value="";
-  document.getElementById("subject").value="";
-  document.getElementById("otherSubject").value="";
-  document.getElementById("otherBox").style.display="none";
-
-}
-
-
-/* =============== LEADERBOARD ================= */
-
+/* LOAD BOARD */
 function loadBoard(){
+
+  const my = localStorage.getItem("discord");
 
   fetch(API)
   .then(r=>r.json())
@@ -555,33 +207,22 @@ function loadBoard(){
 <th>Streak</th>
 </tr>`;
 
-
     data.forEach((u,i)=>{
 
-      let c="";
-      if(i==0)c="rank1";
-      if(i==1)c="rank2";
-      if(i==2)c="rank3";
-
-
       board.innerHTML+=`
-<tr class="${c}">
+<tr>
 <td>${i+1}</td>
 <td>${u.name}</td>
 <td>${u.totalXP}</td>
 <td>${u.streak}</td>
 </tr>`;
 
-
-      if(u.discord === document.getElementById("discord").value){
+      if(u.discord === my){
 
         dName.innerText=u.name;
         dXP.innerText=u.totalXP;
         dStreak.innerText=u.streak;
         dRank.innerText=i+1;
-
-        xpBar.style.width=Math.min(u.totalXP,100)+"%";
-        streakBar.style.width=Math.min(u.streak*12,100)+"%";
 
       }
 
@@ -591,7 +232,8 @@ function loadBoard(){
 
 }
 
-
+/* INIT */
+checkLogin();
 loadBoard();
 
 </script>
