@@ -5,31 +5,26 @@ import cors from "cors";
 const app = express();
 app.use(cors());
 
-const CLIENT_ID = "YOUR_CLIENT_ID";
-const CLIENT_SECRET = "YOUR_CLIENT_SECRET";
+const CLIENT_ID = "YOUR_DISCORD_CLIENT_ID";
+const CLIENT_SECRET = "YOUR_DISCORD_CLIENT_SECRET";
 const REDIRECT_URI = "http://localhost:3000/callback";
 
-/* ================= LOGIN ================= */
-
+/* LOGIN */
 app.get("/login", (req, res) => {
-
   const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=identify`;
-
   res.redirect(url);
 });
 
-/* ================= CALLBACK ================= */
-
+/* CALLBACK */
 app.get("/callback", async (req, res) => {
-
   try {
-
     const code = req.query.code;
 
-    // exchange code → token
     const tokenRes = await fetch("https://discord.com/api/oauth2/token", {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
       body: new URLSearchParams({
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
@@ -41,7 +36,6 @@ app.get("/callback", async (req, res) => {
 
     const tokenData = await tokenRes.json();
 
-    // get user
     const userRes = await fetch("https://discord.com/api/users/@me", {
       headers: {
         Authorization: `Bearer ${tokenData.access_token}`
@@ -52,7 +46,6 @@ app.get("/callback", async (req, res) => {
 
     const discordTag = `${user.username}#${user.discriminator}`;
 
-    // redirect back to frontend
     res.redirect(
       `http://localhost:5500/index.html?discord=${discordTag}&id=${user.id}&avatar=${user.avatar}`
     );
@@ -60,11 +53,9 @@ app.get("/callback", async (req, res) => {
   } catch (err) {
     res.send("Login failed");
   }
-
 });
 
-/* ================= START ================= */
-
+/* START */
 app.listen(3000, () => {
-  console.log("🚀 Backend running on http://localhost:3000");
+  console.log("🚀 Server running on http://localhost:3000");
 });
