@@ -6,53 +6,120 @@
 <title>Daily Streak Dashboard</title>
 
 <style>
-body{font-family:sans-serif;background:#0f172a;color:white;margin:0}
-.container{max-width:1100px;margin:auto;padding:20px}
-.card{background:#020617;padding:20px;border-radius:10px;margin-bottom:20px}
-button{padding:10px 15px;border:none;border-radius:8px;background:#3b82f6;color:white}
-input,textarea,select{width:100%;margin:5px 0;padding:8px;border-radius:6px;border:1px solid #1e293b;background:#020617;color:white}
-table{width:100%;border-collapse:collapse}
-td,th{padding:8px;border-bottom:1px solid #1e293b;text-align:center}
+body{
+  font-family:sans-serif;
+  background:#0f172a;
+  color:white;
+  margin:0;
+}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+
+.card{
+  background:#020617;
+  padding:20px;
+  border-radius:10px;
+  margin-bottom:20px;
+}
+
+button{
+  padding:10px 15px;
+  border:none;
+  border-radius:8px;
+  background:#3b82f6;
+  color:white;
+  cursor:pointer;
+}
+
+input,textarea,select{
+  width:100%;
+  margin:6px 0;
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #1e293b;
+  background:#020617;
+  color:white;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+td,th{
+  padding:8px;
+  border-bottom:1px solid #1e293b;
+  text-align:center;
+}
 </style>
 </head>
 
 <body>
 
-<div style="text-align:center;padding:20px">
-  <button onclick="loginDiscord()">🔐 Login with Discord</button>
-  <button onclick="logout()">Logout</button>
+<div class="container">
+
+<!-- LOGIN -->
+<div class="card">
+  <h2>🔐 Login</h2>
+
+  <input id="discordInput" placeholder="Enter Discord Username (afkar#1234)">
+  <button onclick="login()">Login</button>
+
 </div>
 
-<div id="app" style="display:none" class="container">
+<!-- APP -->
+<div id="app" style="display:none">
 
+<!-- DASHBOARD -->
 <div class="card">
-  <h2>My Dashboard</h2>
-  <img id="avatar" width="60" style="border-radius:50%">
-  <p id="dName"></p>
-  <p>XP: <span id="dXP"></span></p>
-  <p>Streak: <span id="dStreak"></span></p>
-  <p>Rank: <span id="dRank"></span></p>
+  <h2>📊 My Dashboard</h2>
+
+  <p><b>Name:</b> <span id="dName">-</span></p>
+  <p><b>XP:</b> <span id="dXP">0</span></p>
+  <p><b>Streak:</b> <span id="dStreak">0</span></p>
+  <p><b>Rank:</b> <span id="dRank">-</span></p>
+
 </div>
 
+<!-- FORM -->
 <div class="card">
-  <h2>Submit Work</h2>
 
-  <input id="discord" disabled>
-  <input id="name" placeholder="Name">
-  <select id="subject">
-    <option>Math</option>
-    <option>Physics</option>
-  </select>
-  <input id="topic" placeholder="Topic">
-  <textarea id="work" placeholder="Work"></textarea>
+<h2>✍️ Submit Work</h2>
 
-  <button onclick="submitData()">Submit</button>
-  <p id="msg"></p>
+<input id="discord" disabled>
+<input id="name" placeholder="Name">
+
+<select id="subject">
+  <option value="">Select Subject</option>
+  <option>Math</option>
+  <option>Physics</option>
+  <option>Other</option>
+</select>
+
+<input id="topic" placeholder="Topic">
+<textarea id="work" placeholder="Work"></textarea>
+
+<button onclick="submitData()">Submit</button>
+
+<p id="msg"></p>
+
 </div>
 
+<!-- LEADERBOARD -->
 <div class="card">
-  <h2>Leaderboard</h2>
-  <table id="board"></table>
+
+<h2>🏆 Leaderboard</h2>
+
+<table id="board"></table>
+
+</div>
+
+<button onclick="logout()">Logout</button>
+
 </div>
 
 </div>
@@ -62,57 +129,55 @@ td,th{padding:8px;border-bottom:1px solid #1e293b;text-align:center}
 const API = "https://script.google.com/macros/s/AKfycbwaZN3uo-CVGI59m7cTnRfGtlP8Jvp5LXTx54f4vEZ2_3RoOleP2w4JYfyYA7h3qKuM/exec";
 
 /* LOGIN */
-function loginDiscord(){
-  window.location.href = "http://localhost:3000/login";
+function login(){
+
+  const discord = document.getElementById("discordInput").value.trim();
+
+  if(!discord){
+    alert("Enter Discord username");
+    return;
+  }
+
+  localStorage.setItem("discord", discord);
+
+  location.reload();
 }
 
+/* LOGOUT */
 function logout(){
   localStorage.clear();
   location.reload();
 }
 
-/* GET USER */
-function getUser(){
-  const p = new URLSearchParams(window.location.search);
-
-  const discord = p.get("discord");
-  const id = p.get("id");
-  const avatar = p.get("avatar");
-
-  if(discord){
-    localStorage.setItem("discord", discord);
-    localStorage.setItem("discord_id", id);
-    localStorage.setItem("avatar", avatar);
-  }
-}
-
 /* CHECK LOGIN */
 function checkLogin(){
-  const d = localStorage.getItem("discord");
-  const id = localStorage.getItem("discord_id");
-  const avatar = localStorage.getItem("avatar");
 
-  if(d){
-    app.style.display="block";
-    document.getElementById("discord").value=d;
+  const discord = localStorage.getItem("discord");
 
-    if(avatar){
-      document.getElementById("avatar").src =
-        `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
-    }
+  if(discord){
+    document.getElementById("app").style.display="block";
+    document.getElementById("discord").value=discord;
   }
+
 }
 
 /* SUBMIT */
 function submitData(){
 
+  const discord = localStorage.getItem("discord");
+  const name = document.getElementById("name").value;
+
+  if(!name){
+    msg.innerText="⚠️ Enter name";
+    return;
+  }
+
   const data = {
-    id: localStorage.getItem("discord_id"),
-    discord: localStorage.getItem("discord"),
-    name: name.value,
-    subject: subject.value,
-    topic: topic.value,
-    work: work.value
+    discord: discord,
+    name: name,
+    subject: document.getElementById("subject").value,
+    topic: document.getElementById("topic").value,
+    work: document.getElementById("work").value
   };
 
   fetch(API,{
@@ -121,36 +186,44 @@ function submitData(){
     body:JSON.stringify(data)
   });
 
-  msg.innerText="Submitted!";
+  msg.innerText="✅ Submitted!";
   loadBoard();
 }
 
 /* LOAD BOARD */
 function loadBoard(){
 
-  const myID = localStorage.getItem("discord_id");
+  const my = localStorage.getItem("discord");
 
   fetch(API)
   .then(r=>r.json())
   .then(data=>{
 
-    board.innerHTML="<tr><th>#</th><th>Name</th><th>XP</th><th>Streak</th></tr>";
+    board.innerHTML=`
+<tr>
+<th>#</th>
+<th>Name</th>
+<th>XP</th>
+<th>Streak</th>
+</tr>`;
 
     data.forEach((u,i)=>{
 
       board.innerHTML+=`
-      <tr>
-        <td>${i+1}</td>
-        <td>${u.name}</td>
-        <td>${u.totalXP}</td>
-        <td>${u.streak}</td>
-      </tr>`;
+<tr>
+<td>${i+1}</td>
+<td>${u.name}</td>
+<td>${u.totalXP}</td>
+<td>${u.streak}</td>
+</tr>`;
 
-      if(u.id === myID){
+      if(u.discord === my){
+
         dName.innerText=u.name;
         dXP.innerText=u.totalXP;
         dStreak.innerText=u.streak;
         dRank.innerText=i+1;
+
       }
 
     });
@@ -160,7 +233,6 @@ function loadBoard(){
 }
 
 /* INIT */
-getUser();
 checkLogin();
 loadBoard();
 
